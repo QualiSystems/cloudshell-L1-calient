@@ -1,0 +1,34 @@
+{
+  "common_variable": {
+    "driver_name": "Calient",
+    "driver_module": ["calient.driver_handler", "CalientDriverHandler"],
+    "connection_type": "tcp",
+    "connection_port": 3083,
+    "device_prompt": "agent>",
+    "server_timeout": 10,
+    "runtime_configuration": "calient_s162_runtime_configuration.json"
+  },
+
+  "cli_variable": {
+    "ssh": ["common.cli.ssh_session", "SSHSession"],
+    "telnet": ["common.cli.telnet_session", "TelnetSession"],
+    "tcp": ["common.cli.tcp_session", "TCPSession"]
+  },
+
+  "driver_variable": {
+    "service_mode": "tl1",
+
+    "resource_name": [
+      "Chassis {0}",
+      "Port {0}"
+    ],
+    "resource_family_name": [
+      "L1 Connectivity Switch",
+      "L1 Switch Port"
+    ],
+    "resource_model_name": [
+      "{0}",
+      "Port {0}"
+    ]
+  }
+}
