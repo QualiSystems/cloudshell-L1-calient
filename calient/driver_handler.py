@@ -46,7 +46,7 @@ class CalientDriverHandler(DriverHandlerBase):
         if self._service_mode.lower() == "rest":
             raise NotImplementedError
         elif self._service_mode.lower() == "tl1":
-            command = 'ACT-USER::{username}:{ctag}::{password};'.format(username=username,
+            command = "ACT-USER::{username}:{ctag}::{password};".format(username=username,
                                                                         ctag=self._ctag,
                                                                         password=password)
             command_result = self._session.send_command(data_str=command,
@@ -55,7 +55,7 @@ class CalientDriverHandler(DriverHandlerBase):
             command_logger.info(command_result)
 
             if "COMPLD" in command_result or "Already logged in" in command_result:
-                command_logger.info('Login status: OK')
+                command_logger.info("Login status: OK")
             else:
                 command_logger.info("Didn't find success login message. Retrying ...")
                 command_result = self._session.send_command(data_str=command,
@@ -65,7 +65,7 @@ class CalientDriverHandler(DriverHandlerBase):
 
             match_result = re.search(r"\s+(?P<host>\S+)\s.+M", command_result, re.DOTALL)
             if match_result:
-                self._switch_name = match_result.groupdict()['host']
+                self._switch_name = match_result.groupdict()["host"]
         else:
             raise Exception(self.__class__.__name__, "From service mode type (current mode: '" +
                             self._service_mode + "'!")
@@ -93,7 +93,7 @@ class CalientDriverHandler(DriverHandlerBase):
                                                             error_map=self.GENERIC_ERRORS)
                 command_logger.info(command_result)
             else:
-                command_logger.info('Logoff status: OK')
+                command_logger.info("Logoff status: OK")
 
     def get_resource_description(self, address, command_logger=None):
         """ Auto-load function to retrieve all information from the device
@@ -276,7 +276,7 @@ class CalientDriverHandler(DriverHandlerBase):
             src_port = src_port[-1].replace("-", ".")
             dst_port = dst_port[-1].replace("-", ".")
 
-            port_info = self._session.send_command("RTRV-PORT-SUM::{src_port};".format(src_port=src_port),
+            port_info = self._session.send_command(data_str="RTRV-PORT-SUM::{src_port};".format(src_port=src_port),
                                                    re_string=self._prompt,
                                                    error_map=self.GENERIC_ERRORS)
 
