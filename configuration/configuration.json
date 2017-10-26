@@ -6,7 +6,7 @@
     "connection_port": 3083,
     "device_prompt": "agent>",
     "server_timeout": 10,
-    "runtime_configuration": "calient_s162_runtime_configuration.json"
+    "runtime_configuration": "calient_s_runtime_configuration.json"
   },
 
   "cli_variable": {
