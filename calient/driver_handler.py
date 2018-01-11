@@ -41,7 +41,8 @@ class CalientDriverHandler(DriverHandlerBase):
         :return: None
         """
 
-        self._session.connect(address, username, password, port=None)
+        self._session.logger = command_logger
+        self._session.connect(address, username, password, port=None, re_string=self._prompt)
 
         if self._service_mode.lower() == "rest":
             raise NotImplementedError
@@ -287,26 +288,34 @@ class CalientDriverHandler(DriverHandlerBase):
                 conn_name = match.group("conn_name")
                 conn_state = match.group("conn_state")
 
-                if conn_name.lower() != "none":
-                    if conn_state == "ACT":
-                        command = ("CANC-CRS::{src_port},{dst_port}:{ctag}::,{group_name},{conn_name};"
-                                   .format(src_port=src_port,
-                                           dst_port=dst_port,
-                                           ctag=self._ctag,
-                                           group_name=self.GROUP_NAME,
-                                           conn_name=conn_name))
-                        self._session.send_command(data_str=command,
-                                                   re_string=self._prompt,
-                                                   error_map=self.GENERIC_ERRORS)
+                conn_name_match = re.search(r"(?P<src_port>\S+)[>-](?P<dst_port>\S+)", conn_name)
 
-                    command = ("DLT-CRS::{src_port},{dst_port}:{ctag}::,{group_name},{conn_name};"
-                               .format(src_port=src_port,
-                                       dst_port=dst_port,
-                                       ctag=self._ctag,
-                                       group_name=self.GROUP_NAME,
-                                       conn_name=conn_name))
+                if conn_name_match:
+                    src_port, dst_port = conn_name_match.groups()
 
-                    self._session.send_command(data_str=command, re_string=self._prompt, error_map=self.GENERIC_ERRORS)
+                    if conn_name.lower() != "none":
+                        if conn_state == "ACT":
+                            # command = ("CANC-CRS::{src_port},{dst_port}:{ctag}::,{group_name},{conn_name};"
+                            #            .format(src_port=src_port,
+                            #                    dst_port=dst_port,
+                            #                    ctag=self._ctag,
+                            #                    group_name=self.GROUP_NAME,
+                            #                    conn_name=conn_name))
+                            command = "CANC-CRS:::::{conn_name};".format(conn_name=conn_name)
+                            self._session.send_command(data_str=command,
+                                                       re_string=self._prompt,
+                                                       error_map=self.GENERIC_ERRORS)
+
+                        # command = ("DLT-CRS::{src_port},{dst_port}:{ctag}::,{group_name},{conn_name};"
+                        #            .format(src_port=src_port,
+                        #                    dst_port=dst_port,
+                        #                    ctag=self._ctag,
+                        #                    group_name=self.GROUP_NAME,
+                        #                    conn_name=conn_name))
+
+                        command = "DLT-CRS:::::{conn_name};".format(conn_name=conn_name)
+
+                        self._session.send_command(data_str=command, re_string=self._prompt, error_map=self.GENERIC_ERRORS)
 
     def map_clear(self, src_port, dst_port, command_logger):
         """ Remove simplex/multi-cast/duplex connection ending on the destination port
