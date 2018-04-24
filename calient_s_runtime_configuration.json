@@ -1,5 +1,8 @@
 {
-  "driver_variable": {
-    "connection_port": 3083
+  "common_variable": {
+    "connection_type": "tcp",
+    "connection_port": 3083,
+    "device_prompt": "agent>",
+    "server_timeout": 10
   }
 }
