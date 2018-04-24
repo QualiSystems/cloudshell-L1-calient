@@ -41,18 +41,30 @@ class CalientDriverHandler(DriverHandlerBase):
         :return: None
         """
 
-        self._session.logger = command_logger
-        self._session.connect(address, username, password, port=None, re_string=self._prompt)
+        # self._session.logger = command_logger
+        # self._session.connect(address, username, password, port=None, re_string=self._prompt)
 
         if self._service_mode.lower() == "rest":
             raise NotImplementedError
         elif self._service_mode.lower() == "tl1":
+
+            self._session.logger = command_logger
+
             command = "ACT-USER::{username}:{ctag}::{password};".format(username=username,
                                                                         ctag=self._ctag,
                                                                         password=password)
-            command_result = self._session.send_command(data_str=command,
-                                                        re_string=self._prompt,
-                                                        error_map=self.GENERIC_ERRORS)
+
+            command_result = self._session.connect(address, username, password,
+                                                   command=command,
+                                                   error_map=self.GENERIC_ERRORS,
+                                                   re_string=self._prompt)
+
+            # command = "ACT-USER::{username}:{ctag}::{password};".format(username=username,
+            #                                                             ctag=self._ctag,
+            #                                                             password=password)
+            # command_result = self._session.send_command(data_str=command,
+            #                                             re_string=self._prompt,
+            #                                             error_map=self.GENERIC_ERRORS)
             command_logger.info(command_result)
 
             if "COMPLD" in command_result or "Already logged in" in command_result:
@@ -194,10 +206,10 @@ class CalientDriverHandler(DriverHandlerBase):
 
         for conn_info in re.finditer(regex, command_result, re.IGNORECASE | re.DOTALL):
             result.update({conn_info.group("dst_port").replace(".", "-"):
-                           conn_info.group("src_port").replace(".", "-")})
+                               conn_info.group("src_port").replace(".", "-")})
             if conn_info.group("conn_type").lower() == "2way":
                 result.update({conn_info.group("src_port").replace(".", "-"):
-                               conn_info.group("dst_port").replace(".", "-")})
+                                   conn_info.group("dst_port").replace(".", "-")})
 
         return result
 
@@ -315,7 +327,8 @@ class CalientDriverHandler(DriverHandlerBase):
 
                         command = "DLT-CRS:::::{conn_name};".format(conn_name=conn_name)
 
-                        self._session.send_command(data_str=command, re_string=self._prompt, error_map=self.GENERIC_ERRORS)
+                        self._session.send_command(data_str=command, re_string=self._prompt,
+                                                   error_map=self.GENERIC_ERRORS)
 
     def map_clear(self, src_port, dst_port, command_logger):
         """ Remove simplex/multi-cast/duplex connection ending on the destination port
